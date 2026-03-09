@@ -85,21 +85,24 @@ ASGI_APPLICATION = 'core.asgi.application'
 
 raw_redis = (os.getenv('REDIS_URL') or 'redis://127.0.0.1:6379').strip()
 
-# Smart Parser: Handle common mistake of pasting the entire CLI command
+# 1. Extract the URL part if it's a CLI command
 if '-u ' in raw_redis:
-    # Extract everything after -u until the next space
-    REDIS_URL = raw_redis.split('-u ')[1].split(' ')[0]
+    temp_url = raw_redis.split('-u ')[1].split(' ')[0]
 else:
-    REDIS_URL = raw_redis
+    temp_url = raw_redis
 
-# Ensure protocol is correct
-if REDIS_URL and not any(REDIS_URL.startswith(s) for s in ['redis://', 'rediss://', 'unix://']):
-    # If it's just a hostname or missing the //
-    clean_url = REDIS_URL.replace('redis:', '').replace('rediss:', '').lstrip('/')
-    if 'upstash.io' in clean_url:
-        REDIS_URL = f"rediss://{clean_url}"
+# 2. Proactively Force rediss:// if Upstash is used or --tls was in the command
+if 'upstash.io' in temp_url or '--tls' in raw_redis:
+    # Strip existing protocols to rebuild cleanly
+    clean_part = temp_url.replace('rediss://', '').replace('redis://', '')
+    clean_part = clean_part.replace('rediss:', '').replace('redis:', '').lstrip('/')
+    REDIS_URL = f"rediss://{clean_part}"
+else:
+    # Ensure at least redis:// is there for local/non-TLS
+    if not any(temp_url.startswith(s) for s in ['redis://', 'rediss://', 'unix://']):
+        REDIS_URL = f"redis://{temp_url.lstrip('/')}"
     else:
-        REDIS_URL = f"redis://{clean_url}"
+        REDIS_URL = temp_url
 
 print(f"DEBUG: FINAL REDIS_URL: {REDIS_URL[:15]}...")
 
