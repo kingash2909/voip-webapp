@@ -86,11 +86,16 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core.wsgi.application'
 ASGI_APPLICATION = 'core.asgi.application'
 
+REDIS_URL = os.getenv('REDIS_URL', 'redis://127.0.0.1:6379')
+# Ensure URL starts with redis:// or rediss:// for Upstash
+if REDIS_URL and not any(REDIS_URL.startswith(s) for s in ['redis://', 'rediss://', 'unix://']):
+    REDIS_URL = f"redis://{REDIS_URL}"
+
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [os.getenv('REDIS_URL', 'redis://127.0.0.1:6379')],
+            "hosts": [REDIS_URL],
         },
     },
 }
