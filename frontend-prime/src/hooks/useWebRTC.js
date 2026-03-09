@@ -215,7 +215,10 @@ export const useWebRTC = (roomName, apiKeyInput = null) => {
     const connectSignaling = useCallback(() => {
         if (!roomName || !apiKey) return;
 
-        const wsUrl = (import.meta.env.VITE_WS_URL || 'ws://localhost:8000').replace(/\/$/, '');
+        let wsUrl = (import.meta.env.VITE_WS_URL || 'ws://localhost:8000').replace(/\/$/, '');
+        if (wsUrl.startsWith('http')) {
+            wsUrl = wsUrl.replace(/^http/, 'ws');
+        }
         const ws = new WebSocket(`${wsUrl}/ws/signaling/${roomName}/?api_key=${apiKey}`);
         socketRef.current = ws;
 
