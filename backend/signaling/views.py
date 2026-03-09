@@ -7,15 +7,16 @@ from .models import APIKey, Project, Room, CallLog
 from django.contrib.auth.models import User
 
 def api_key_info(request):
-    # For MVP: Always return the first key or create one for the first user
-    user = User.objects.first()
-    if not user:
-        return JsonResponse({'error': 'No user found'}, status=404)
+    # For MVP: Get or create a system user to "own" the project
+    user, _ = User.objects.get_or_create(
+        username='system_admin',
+        defaults={'is_staff': True, 'is_superuser': True}
+    )
 
     # Ensure the user has at least one project
     project, _ = Project.objects.get_or_create(
         owner=user, 
-        defaults={'name': f"{user.username}'s First Project"}
+        defaults={'name': "Default Project"}
     )
     
     # Get or create an API Key for this project
