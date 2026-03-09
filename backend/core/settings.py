@@ -85,26 +85,30 @@ ASGI_APPLICATION = 'core.asgi.application'
 
 raw_redis = (os.getenv('REDIS_URL') or 'redis://127.0.0.1:6379').strip()
 
-# 1. Extract the URL part if it's a CLI command
+# 1. Surgical Extraction of the URL part
 if '-u ' in raw_redis:
     temp_url = raw_redis.split('-u ')[1].split(' ')[0]
 else:
     temp_url = raw_redis
 
-# 2. Proactively Force rediss:// if Upstash is used or --tls was in the command
-if 'upstash.io' in temp_url or '--tls' in raw_redis:
-    # Strip existing protocols to rebuild cleanly
-    clean_part = temp_url.replace('rediss://', '').replace('redis://', '')
-    clean_part = clean_part.replace('rediss:', '').replace('redis:', '').lstrip('/')
-    REDIS_URL = f"rediss://{clean_part}"
-else:
-    # Ensure at least redis:// is there for local/non-TLS
-    if not any(temp_url.startswith(s) for s in ['redis://', 'rediss://', 'unix://']):
-        REDIS_URL = f"redis://{temp_url.lstrip('/')}"
-    else:
-        REDIS_URL = temp_url
+# 2. Remove ANY existing protocol prefix safely (regex-like but manual)
+for prefix in ['rediss://', 'redis://', 'rediss:', 'redis:']:
+    if temp_url.lower().startswith(prefix):
+        temp_url = temp_url[len(prefix):].lstrip('/')
+        break
 
-print(f"DEBUG: FINAL REDIS_URL: {REDIS_URL[:15]}...")
+# 3. Cleanly Rebuild the URL
+# If Upstash is used or --tls was requested, force rediss://
+if 'upstash.io' in temp_url.lower() or '--tls' in raw_redis.lower():
+    REDIS_URL = f"rediss://{temp_url}"
+else:
+    REDIS_URL = f"redis://{temp_url}"
+
+# Final safety check: if we somehow stripped everything but the port
+if REDIS_URL.endswith('://'):
+    REDIS_URL = 'redis://127.0.0.1:6379'
+
+print(f"DEBUG: [CONNECTION] Parsed Redis URL (obfuscated): {REDIS_URL.split('@')[-1] if '@' in REDIS_URL else REDIS_URL[:20]}...")
 
 CHANNEL_LAYERS = {
     'default': {
