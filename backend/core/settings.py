@@ -83,11 +83,16 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core.wsgi.application'
 ASGI_APPLICATION = 'core.asgi.application'
 
-REDIS_URL = (os.getenv('REDIS_URL') or 'redis://127.0.0.1:6379').strip()
+raw_redis = (os.getenv('REDIS_URL') or 'redis://127.0.0.1:6379').strip()
 
-# Ensure URL starts with redis:// or rediss://
+# Smart Parser: If user accidentally pasted a CLI command like "redis-cli -u redis://..."
+if '-u ' in raw_redis:
+    REDIS_URL = raw_redis.split('-u ')[1].split(' ')[0]
+else:
+    REDIS_URL = raw_redis
+
+# Ensure URL starts with redis:// or rediss:// for Upstash/Production
 if REDIS_URL and not any(REDIS_URL.startswith(s) for s in ['redis://', 'rediss://', 'unix://']):
-    # If it contains upstash.io, it almost certainly needs SSL (rediss)
     if 'upstash.io' in REDIS_URL:
         REDIS_URL = f"rediss://{REDIS_URL}"
     else:
