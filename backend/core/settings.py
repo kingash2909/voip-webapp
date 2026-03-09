@@ -85,18 +85,29 @@ ASGI_APPLICATION = 'core.asgi.application'
 
 raw_redis = (os.getenv('REDIS_URL') or 'redis://127.0.0.1:6379').strip()
 
-# Smart Parser: If user accidentally pasted a CLI command like "redis-cli -u redis://..."
+# Super-defensive extraction
 if '-u ' in raw_redis:
     REDIS_URL = raw_redis.split('-u ')[1].split(' ')[0]
+elif '://' not in raw_redis and (raw_redis.startswith('redis') or raw_redis.startswith('rediss')):
+    # Fix common typo where "//" is missing after "redis:" or "rediss:"
+    if raw_redis.startswith('rediss'):
+        REDIS_URL = 'rediss://' + raw_redis.replace('rediss:', '', 1).lstrip('/')
+    else:
+        REDIS_URL = 'redis://' + raw_redis.replace('redis:', '', 1).lstrip('/')
 else:
     REDIS_URL = raw_redis
 
-# Ensure URL starts with redis:// or rediss:// for Upstash/Production
+# Final protocol check
 if REDIS_URL and not any(REDIS_URL.startswith(s) for s in ['redis://', 'rediss://', 'unix://']):
     if 'upstash.io' in REDIS_URL:
         REDIS_URL = f"rediss://{REDIS_URL}"
     else:
         REDIS_URL = f"redis://{REDIS_URL}"
+
+# Defensive check for common typos like "ediss"
+REDIS_URL = REDIS_URL.replace('redis://rediss:', 'rediss://')
+
+print(f"DEBUG: Internal Redis Connection String (obfuscated): {REDIS_URL[:15]}...")
 
 CHANNEL_LAYERS = {
     'default': {
