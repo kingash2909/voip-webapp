@@ -31,10 +31,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-fallback-key-do-not
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
-RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+ALLOWED_HOSTS = ['*'] # Broaden for debugging MVP connections
 
 # CSRF Trusted Origins for Render and Vercel
 CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com', 'https://*.vercel.app']
@@ -86,10 +83,15 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core.wsgi.application'
 ASGI_APPLICATION = 'core.asgi.application'
 
-REDIS_URL = os.getenv('REDIS_URL', 'redis://127.0.0.1:6379')
-# Ensure URL starts with redis:// or rediss:// for Upstash
+REDIS_URL = (os.getenv('REDIS_URL') or 'redis://127.0.0.1:6379').strip()
+
+# Ensure URL starts with redis:// or rediss://
 if REDIS_URL and not any(REDIS_URL.startswith(s) for s in ['redis://', 'rediss://', 'unix://']):
-    REDIS_URL = f"redis://{REDIS_URL}"
+    # If it contains upstash.io, it almost certainly needs SSL (rediss)
+    if 'upstash.io' in REDIS_URL:
+        REDIS_URL = f"rediss://{REDIS_URL}"
+    else:
+        REDIS_URL = f"redis://{REDIS_URL}"
 
 CHANNEL_LAYERS = {
     'default': {
