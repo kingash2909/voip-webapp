@@ -21,7 +21,7 @@ export const useWebRTC = (roomName, apiKeyInput = null) => {
             setApiKey(apiKeyInput);
         } else {
             // Fetch the default developer API key from the backend
-            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+            const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '');
             fetch(`${apiUrl}/api/project/apikey/`)
                 .then(res => res.json())
                 .then(data => {
@@ -52,7 +52,7 @@ export const useWebRTC = (roomName, apiKeyInput = null) => {
 
         try {
             log('Uploading recording for AI processing...');
-            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+            const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '');
             const res = await fetch(`${apiUrl}/api/calls/upload/`, {
                 method: 'POST',
                 body: formData
@@ -215,7 +215,7 @@ export const useWebRTC = (roomName, apiKeyInput = null) => {
     const connectSignaling = useCallback(() => {
         if (!roomName || !apiKey) return;
 
-        const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:8000';
+        const wsUrl = (import.meta.env.VITE_WS_URL || 'ws://localhost:8000').replace(/\/$/, '');
         const ws = new WebSocket(`${wsUrl}/ws/signaling/${roomName}/?api_key=${apiKey}`);
         socketRef.current = ws;
 

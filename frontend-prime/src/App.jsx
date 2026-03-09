@@ -91,7 +91,7 @@ function App() {
   const [expandedCall, setExpandedCall] = useState(null);
 
   const fetchHistory = useCallback(() => {
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '');
     fetch(`${apiUrl}/api/calls/history/`)
       .then(res => res.json())
       .then(data => setHistory(data))
@@ -99,7 +99,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '');
     fetch(`${apiUrl}/api/project/apikey/`)
       .then(res => {
         if (!res.ok) throw new Error('Backend unreachable');
@@ -471,7 +471,7 @@ function App() {
                   <Globe size={18} color="var(--accent-gold)" /> Signaling Endpoint
                 </h3>
                 <code style={{ display: 'block', background: '#000', padding: '12px', borderRadius: '8px', fontSize: '13px', color: '#888' }}>
-                  {import.meta.env.VITE_WS_URL || 'ws://localhost:8000'}/ws/signaling/
+                  {(import.meta.env.VITE_WS_URL || 'ws://localhost:8000').replace(/\/$/, '')}/ws/signaling/
                 </code>
               </div>
               <div className="glass-card" style={{ padding: '24px' }}>
