@@ -12,14 +12,21 @@ class SignalingConsumer(AsyncWebsocketConsumer):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = f'signaling_{self.room_name}'
         
+        print(f"DEBUG: WebSocket connecting to room: {self.room_name}")
+
         # Extract API Key from query string
         query_string = self.scope.get('query_string', b'').decode('utf-8')
         query_params = dict(qp.split('=') for qp in query_string.split('&') if '=' in qp)
         api_key_val = query_params.get('api_key')
+        
+        print(f"DEBUG: API Key: {api_key_val[:8]}..." if api_key_val else "DEBUG: No API Key found")
 
         if not api_key_val or not await self.validate_api_key(api_key_val):
+            print(f"DEBUG: Validation FAILED for key: {api_key_val}")
             await self.close()
             return
+
+        print("DEBUG: Validation SUCCESS. Joining group and accepting.")
 
         # Join room group
         await self.channel_layer.group_add(
@@ -31,7 +38,7 @@ class SignalingConsumer(AsyncWebsocketConsumer):
         if self.room_group_name not in room_participants:
             room_participants[self.room_group_name] = set()
         
-        # Using a simple "User X" label for MVP since we don't have full auth in the scope yet
+        # Using a simple "User X" label for MVP
         self.user_label = f"User_{self.channel_name[-4:]}"
         room_participants[self.room_group_name].add(self.user_label)
 
