@@ -2,15 +2,21 @@
 
 A professional, high-performance VoIP infrastructure and dashboard designed for SaaS developers. This project provides a robust signaling server, a premium monitoring dashboard, and a plug-and-play JavaScript SDK.
 
+<img width="1470" height="719" alt="Screenshot 2026-03-10 at 2 25 23 PM" src="https://github.com/user-attachments/assets/dcc192ff-547d-424a-bdc8-bee54d84abda" /><img width="1470" height="719" alt="Screenshot 2026-03-10 at 2 25 47 PM" src="https://github.com/user-attachments/assets/6d31de07-881b-4abc-8604-ff8b2609a90d" />
+<img width="1470" height="719" alt="Screenshot 2026-03-10 at 2 26 05 PM" src="https://github.com/user-attachments/assets/4653de6c-229d-43f7-96be-72333bb1c992" /><img width="1470" height="719" alt="Screenshot 2026-03-10 at 2 28 42 PM" src="https://github.com/user-attachments/assets/1250908f-b3eb-48eb-bf47-e0dd4958ce94" />
+
+
 ---
 
 ## 🏗 System Architecture & Code Flow
+<img width="1536" height="1024" alt="voip architecture" src="https://github.com/user-attachments/assets/cff2a523-af89-46f8-8461-9ee4d4346b7e" />
 
 ```mermaid
 sequenceDiagram
     participant A as User A (Caller)
     participant S as Signaling Server (Django/Redis/Daphne)
     participant B as User B (Callee)
+
 
     Note over A,B: 1. Signaling Handshake
     A->>S: WebSocket Connect (Room: test-room, API_KEY: ...)
