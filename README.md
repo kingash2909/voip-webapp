@@ -69,35 +69,77 @@ Since WebRTC cannot connect two users directly without knowing their IP addresse
 
 ---
 
-## 🚀 Production Deployment Guide
+## 🛠 Tech Stack
 
-### 1. Infrastructure Requirements
-- **Server**: A Linux VPS (Ubuntu 22.04 recommended).
-- **Database**: Migrate from SQLite to **PostgreSQL**.
-- **Message Broker**: Use a managed **Redis** instance (e.g., AWS ElastiCache or Redis Labs).
-- **TURN Server**: Deploy the included Coturn script on a **separate** public IP if possible to ensure high-quality media relay.
+| Component | Technology | Description |
+| :--- | :--- | :--- |
+| **Frontend** | [React](https://reactjs.org/) + [Vite](https://vitejs.dev/) | High-performance SPA with Framer Motion animations. |
+| **Backend** | [Django](https://www.djangoproject.com/) + [Channels](https://channels.readthedocs.io/) | Asynchronous Python backend for WebSockets. |
+| **Server** | [Daphne](https://github.com/django/daphne) | ASGI server for handling real-time signaling. |
+| **Database** | [Neon (Postgres)](https://neon.tech/) | Serverless PostgreSQL for reliable data storage. |
+| **Redis** | [Upstash](https://upstash.com/) | Serverless Redis for signaling state & message brokering. |
+| **UI Icons** | [Lucide React](https://lucide.dev/) | Pixel-perfect modern icons. |
+| **Animations** | [Framer Motion](https://www.framer.com/motion/) | Smooth, buttery-grade UI transitions. |
 
-### 2. Security Hardening (Mandatory)
-- **CORS**: Update `settings.py` -> `CORS_ALLOWED_ORIGINS` to only allow your specific frontend domain instead of `True`.
-- **SSL/HTTPS**: WebRTC **requires** HTTPS. Use Nginx with Certbot (Let's Encrypt).
-- **WSS**: Ensure your WebSocket connections use `wss://` (secure) in production.
-- **Admin Password**: Change the default admin gate passphrase in `App.jsx` from `admin123` to a secure secret.
+---
 
-### 3. Deployment Steps
-```bash
-# 1. Clone & Set Environment
-cp backend/.env.example backend/.env
-# Edit .env with your PRODUCTION_SECRET_KEY and DB_URL
+## 🚀 Step-by-Step Deployment Guide (100% Free)
 
-# 2. Setup Gunicorn/Daphne
-# Use Daphne as the ASGI server to handle WebSockets
-daphne -b 0.0.0.0 -p 8000 core.asgi:application
+Follow these steps to get your VoIP project live in under 15 minutes.
 
-# 3. Build Frontend
-cd frontend-prime
-npm run build
-# Serve the 'dist' folder via Nginx
-```
+### 1. Database: Neon (Postgres)
+1.  Go to [Neon.tech](https://neon.tech) and create a free account.
+2.  Create a new project named `voip-backend`.
+3.  Copy the **Connection String** (it starts with `postgresql://...`).
+4.  Save this; you'll need it as `DATABASE_URL`.
+
+### 2. Signaling: Upstash (Redis)
+1.  Go to [Upstash.com](https://upstash.com).
+2.  Create a **Serverless Redis** database.
+3.  Copy the **Redis URL** (it starts with `rediss://...` or `redis://...`).
+4.  Save this; you'll need it as `REDIS_URL`.
+
+### 3. Backend: Render
+1.  Go to [Render.com](https://render.com).
+2.  **New + Web Service**.
+3.  Connect your GitHub repository.
+4.  **Settings**:
+    - **Root Directory**: `backend`
+    - **Build Command**: `pip install -r requirements.txt && python manage.py migrate`
+    - **Start Command**: `daphne core.asgi:application` (Handles both HTTP and WebSockets).
+5.  **Environment Variables**:
+    - `DATABASE_URL`: (From Neon)
+    - `REDIS_URL`: (From Upstash)
+    - `DJANGO_SECRET_KEY`: (Any random string)
+    - `DJANGO_DEBUG`: `False`
+    - `DJANGO_ALLOWED_HOSTS`: `your-app-name.onrender.com`
+
+### 4. Frontend: Vercel
+1.  Go to [Vercel.com](https://vercel.com).
+2.  **Add New Project** + Select your GitHub repo.
+3.  **Settings**:
+    - **Root Directory**: `frontend-prime`
+    - **Framework Preset**: `Vite`
+4.  **Environment Variables**:
+    - `VITE_API_URL`: `https://your-app-name.onrender.com`
+    - `VITE_WS_URL`: `wss://your-app-name.onrender.com`
+5.  **Deploy**.
+
+### 5. Security & Verification
+1.  Once Render is live, go to the URL. If you see a "Not Found" or a Django welcome page, it's working.
+2.  In your React app, ensure you use the `VITE_WS_URL` for the signaling connection.
+3.  Open the Vercel URL and test a call between two tabs!
+
+---
+
+## 📖 How to Use the App
+**Vocalis** makes it incredibly easy to start a secure call:
+1.  **Open Dashboard**: Launch your Vercel URL.
+2.  **Set Room**: Enter a unique room name (e.g., `meeting-123`) in the top search bar.
+3.  **Connect**: Click **Join Room**. You're now live on the signaling server!
+4.  **Invite**: Ask your friend to join the *same* room name on their device.
+5.  **Call**: Once they appear in the "Active Participants" list, click the **Green Phone Icon** to start the peer-to-peer call.
+6.  **Need Help?**: Click the **"How to Use"** button in the sidebar for a visual guide anytime!
 
 ---
 
