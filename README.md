@@ -37,8 +37,7 @@ sequenceDiagram
     S->>A: Forward Candidate
 
     Note over A,B: 4. Peer-to-Peer Connection Established
-    A<->>B: P2P Secure Media Stream (Audio/Video)
-    Note right of S: Server is now idle (no media load)mermaid
+    Note right of S: Server is now idle (no media load)
 ```
 
 The application operates on a **Signaling-First Architecture** using WebRTC for peer-to-peer media transport.
