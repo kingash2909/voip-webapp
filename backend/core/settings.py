@@ -83,39 +83,41 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core.wsgi.application'
 ASGI_APPLICATION = 'core.asgi.application'
 
-# --- DEPLOYMENT DIAGNOSTICS ---
-VERSION_TAG = "10MAR_v1_ROBUST"
-print(f"DEBUG: STARTING DEPLOYMENT VERSION: {VERSION_TAG}")
+# --- 🚀 NUCLEAR PRODUCTION DIAGNOSTICS 🚀 ---
+import time
+VERSION_TAG = f"10MAR_v2_FINAL_{int(time.time())}"
+print(f"\n{'='*40}")
+print(f"DEBUG: DEPLOYMENT VERSION: {VERSION_TAG}")
+print(f"{'='*40}\n")
 
 raw_redis = (os.getenv('REDIS_URL') or 'redis://127.0.0.1:6379').strip()
 
-# 1. Surgical Extraction of the URL part
+# 1. Zero-Cleverness Extraction
+# If it's a CLI command, just find the parts.
 if '-u ' in raw_redis:
-    temp_url = raw_redis.split('-u ')[1].split(' ')[0]
+    potential_url = raw_redis.split('-u ')[1].split(' ')[0]
 else:
-    temp_url = raw_redis
+    potential_url = raw_redis
 
-# 2. Remove ANY existing protocol prefix safely
-# Ordering is important: longest first
-prefixes = ['rediss://', 'redis://', 'rediss:', 'redis:']
-for prefix in prefixes:
-    if temp_url.lower().startswith(prefix):
-        temp_url = temp_url[len(prefix):].lstrip('/')
-        break
-
-# 3. Cleanly Rebuild the URL
-# If Upstash is used or --tls was requested, force rediss://
-if 'upstash.io' in temp_url.lower() or '--tls' in raw_redis.lower():
-    REDIS_URL = f"rediss://{temp_url}"
+# 2. Extract ONLY the host/port/auth part (ignore the protocol entirely)
+# We find where '://' is, or where ':' is if no '://'
+if '://' in potential_url:
+    clean_payload = potential_url.split('://', 1)[1]
+elif potential_url.startswith('redis:') or potential_url.startswith('rediss:'):
+    clean_payload = potential_url.split(':', 1)[1].lstrip('/')
 else:
-    REDIS_URL = f"redis://{temp_url}"
+    clean_payload = potential_url.lstrip('/')
 
-# 4. Final Anti-Corrosion check (Emergency Fix for 'ediss')
-if 'ediss:' in REDIS_URL:
-    REDIS_URL = REDIS_URL.replace('ediss:', 'rediss:')
-    print("DEBUG: EMERGENCY: Fixed corrupted 'ediss' protocol.")
+# 3. Explicit Reconstruction
+# Logic: If it's Upstash or --tls was requested, use rediss://. Otherwise redis://.
+if 'upstash.io' in clean_payload.lower() or '--tls' in raw_redis.lower():
+    REDIS_URL = f"rediss://{clean_payload}"
+else:
+    REDIS_URL = f"redis://{clean_payload}"
 
-print(f"DEBUG: [CONNECTION] Parsed Redis (masked): {REDIS_URL.split('@')[-1] if '@' in REDIS_URL else REDIS_URL}...")
+# 4. FINAL sanity check (Masking for safety)
+masked_url = REDIS_URL.split('@')[-1] if '@' in REDIS_URL else REDIS_URL
+print(f"DEBUG: [CHANNEL_LAYER] Final Connection String: {masked_url}\n")
 
 CHANNEL_LAYERS = {
     'default': {
