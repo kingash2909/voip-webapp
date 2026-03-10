@@ -114,7 +114,8 @@ npm run build
 
 ## � What's Missing? (Roadmap currently Work in Progress)
 To make this a complete commercial SaaS, consider adding:
-1.  **User Authentication**: Replace the simple Admin Gate with Django's built-in User/JWT auth for customers.
-2.  **Billing Integration**: Add Stripe to charge users per second of call time.
-3.  **Mobile Support**: Use the SDK within a React Native or Flutter app (RTCPeerConnection is supported).
-4.  **Multi-Party Calls**: Currently optimized for 1-on-1. For 3+ people, you would need an **SFU (Selective Forwarding Unit)** like Janus or Mediasoup.
+1.  **AI integration which will analyze the conversation and context and accordingly summerize the whole call in breif and help to take decision realtime too.
+2.  **User Authentication**: Replace the simple Admin Gate with Django's built-in User/JWT auth for customers.
+3.  **Billing Integration**: Add Stripe to charge users per second of call time.
+4.  **Mobile Support**: Use the SDK within a React Native or Flutter app (RTCPeerConnection is supported).
+5.  **Multi-Party Calls**: Currently optimized for 1-on-1. For 3+ people, you would need an **SFU (Selective Forwarding Unit)** like Janus or Mediasoup.
