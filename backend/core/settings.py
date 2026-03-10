@@ -83,6 +83,10 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core.wsgi.application'
 ASGI_APPLICATION = 'core.asgi.application'
 
+# --- DEPLOYMENT DIAGNOSTICS ---
+VERSION_TAG = "10MAR_v1_ROBUST"
+print(f"DEBUG: STARTING DEPLOYMENT VERSION: {VERSION_TAG}")
+
 raw_redis = (os.getenv('REDIS_URL') or 'redis://127.0.0.1:6379').strip()
 
 # 1. Surgical Extraction of the URL part
@@ -91,8 +95,10 @@ if '-u ' in raw_redis:
 else:
     temp_url = raw_redis
 
-# 2. Remove ANY existing protocol prefix safely (regex-like but manual)
-for prefix in ['rediss://', 'redis://', 'rediss:', 'redis:']:
+# 2. Remove ANY existing protocol prefix safely
+# Ordering is important: longest first
+prefixes = ['rediss://', 'redis://', 'rediss:', 'redis:']
+for prefix in prefixes:
     if temp_url.lower().startswith(prefix):
         temp_url = temp_url[len(prefix):].lstrip('/')
         break
@@ -104,11 +110,12 @@ if 'upstash.io' in temp_url.lower() or '--tls' in raw_redis.lower():
 else:
     REDIS_URL = f"redis://{temp_url}"
 
-# Final safety check: if we somehow stripped everything but the port
-if REDIS_URL.endswith('://'):
-    REDIS_URL = 'redis://127.0.0.1:6379'
+# 4. Final Anti-Corrosion check (Emergency Fix for 'ediss')
+if 'ediss:' in REDIS_URL:
+    REDIS_URL = REDIS_URL.replace('ediss:', 'rediss:')
+    print("DEBUG: EMERGENCY: Fixed corrupted 'ediss' protocol.")
 
-print(f"DEBUG: [CONNECTION] Parsed Redis URL (obfuscated): {REDIS_URL.split('@')[-1] if '@' in REDIS_URL else REDIS_URL[:20]}...")
+print(f"DEBUG: [CONNECTION] Parsed Redis (masked): {REDIS_URL.split('@')[-1] if '@' in REDIS_URL else REDIS_URL}...")
 
 CHANNEL_LAYERS = {
     'default': {
