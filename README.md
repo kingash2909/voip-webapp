@@ -1,4 +1,4 @@
-# VoIP-as-a-Service (VaaS)
+# VOCALIS is a VoIP-as-a-Service (VaaS)
 
 A professional, high-performance VoIP infrastructure and dashboard designed for SaaS developers. This project provides a robust signaling server, a premium monitoring dashboard, and a plug-and-play JavaScript SDK.
 
@@ -112,7 +112,7 @@ npm run build
 
 ---
 
-## � What's Missing? (Roadmap)
+## � What's Missing? (Roadmap currently Work in Progress)
 To make this a complete commercial SaaS, consider adding:
 1.  **User Authentication**: Replace the simple Admin Gate with Django's built-in User/JWT auth for customers.
 2.  **Billing Integration**: Add Stripe to charge users per second of call time.
