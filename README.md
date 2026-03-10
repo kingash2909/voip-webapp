@@ -11,7 +11,35 @@ A professional, high-performance VoIP infrastructure and dashboard designed for 
 ## 🏗 System Architecture & Code Flow
 <img width="1536" height="1024" alt="voip architecture" src="https://github.com/user-attachments/assets/cff2a523-af89-46f8-8461-9ee4d4346b7e" />
 
+```mermaid
+sequenceDiagram
+    participant A as User A (Caller)
+    participant S as Signaling Server (Django/Redis/Daphne)
+    participant B as User B (Callee)
 
+
+    Note over A,B: 1. Signaling Handshake
+    A->>S: WebSocket Connect (Room: test-room, API_KEY: ...)
+    B->>S: WebSocket Connect (Room: test-room, API_KEY: ...)
+    S-->>A: Connected (Participant List)
+    S-->>B: Connected (Participant List)
+
+    Note over A,S: 2. WebRTC Negotiation
+    A->>S: Send Offer (SDP)
+    S->>B: Forward Offer (SDP)
+    B->>S: Send Answer (SDP)
+    S->>A: Forward Answer (SDP)
+
+    Note over A,B: 3. ICE Candidate Exchange
+    A->>S: ICE Candidate (Network Path)
+    S->>B: Forward Candidate
+    B->>S: ICE Candidate (Network Path)
+    S->>A: Forward Candidate
+
+    Note over A,B: 4. Peer-to-Peer Connection Established
+    A<->>B: P2P Secure Media Stream (Audio/Video)
+    Note right of S: Server is now idle (no media load)mermaid
+```
 
 The application operates on a **Signaling-First Architecture** using WebRTC for peer-to-peer media transport.
 
