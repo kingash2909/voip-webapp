@@ -216,6 +216,7 @@ h3 {
 .pulse {
   animation: pulse-gold 2s infinite;
 }
+
 @media (max-width: 768px) {
   .footer-responsive {
     flex-direction: column !important;
@@ -231,4 +232,121 @@ h3 {
   .settings-grid {
     grid-template-columns: 1fr !important;
   }
+}
+
+/* Help Modal Styles */
+.help-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(15px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.help-modal {
+  width: 100%;
+  max-width: 500px;
+  padding: 32px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 0 50px rgba(212, 175, 55, 0.15);
+}
+
+.help-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 32px;
+  position: relative;
+}
+
+.help-icon-wrapper {
+  width: 56px;
+  height: 56px;
+  background: var(--accent-gold-glow);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.close-help {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.close-help:hover {
+  background: var(--danger);
+  color: white;
+}
+
+.help-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.help-step {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.help-step:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--accent-gold-glow);
+}
+
+.step-number {
+  width: 28px;
+  height: 28px;
+  background: var(--accent-gold);
+  color: #000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.step-content h3 {
+  font-size: 16px;
+  margin-bottom: 4px;
+  color: var(--text-primary);
+}
+
+.step-content p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.help-footer {
+  border-top: 1px solid var(--border);
+  padding-top: 24px;
 }

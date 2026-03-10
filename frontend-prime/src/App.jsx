@@ -15,12 +15,14 @@ import {
   Unlock,
   Key,
   Menu,
-  X
+  X,
+  HelpCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 function App() {
   const [roomName, setRoomName] = useState('testroom');
+  const [showHelp, setShowHelp] = useState(false);
   const {
     status,
     isConnected,
@@ -192,6 +194,21 @@ function App() {
               <ShieldCheck size={18} /> Settings & API
             </button>
           )}
+
+          <button
+            className="btn-tab"
+            onClick={() => setShowHelp(true)}
+            style={{
+              background: 'transparent',
+              color: 'var(--text-secondary)',
+              border: 'none', padding: '12px', textAlign: 'left', borderRadius: '8px', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: '10px',
+              marginTop: '8px',
+              fontSize: '14px'
+            }}
+          >
+            <HelpCircle size={18} /> How to Use
+          </button>
         </nav>
 
         <hr style={{ border: 'none', borderTop: '1px solid var(--border)' }} />
@@ -631,6 +648,71 @@ function App() {
                   <button type="submit" className="btn-primary" style={{ flex: 1 }}>Login</button>
                 </div>
               </form>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {showHelp && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="help-overlay"
+            onClick={() => setShowHelp(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              className="glass-card help-modal"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="help-header">
+                <div className="help-icon-wrapper">
+                  <HelpCircle size={32} color="var(--accent-gold)" />
+                </div>
+                <div>
+                  <h2 style={{ fontSize: '24px', marginBottom: '4px' }}>How to use Vocalis</h2>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>Connect with anyone, anywhere in 4 simple steps.</p>
+                </div>
+                <button className="close-help" onClick={() => setShowHelp(false)}>
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="help-steps">
+                <div className="help-step">
+                  <div className="step-number">1</div>
+                  <div className="step-content">
+                    <h3>Set a Room Name</h3>
+                    <p>Enter a unique room name in the header (e.g., "my-secret-meeting").</p>
+                  </div>
+                </div>
+                <div className="help-step">
+                  <div className="step-number">2</div>
+                  <div className="step-content">
+                    <h3>Join the Room</h3>
+                    <p>Click "Join Room" to connect to our signaling server.</p>
+                  </div>
+                </div>
+                <div className="help-step">
+                  <div className="step-number">3</div>
+                  <div className="step-content">
+                    <h3>Share the Link</h3>
+                    <p>Tell your friend to use the same room name on their device.</p>
+                  </div>
+                </div>
+                <div className="help-step">
+                  <div className="step-number">4</div>
+                  <div className="step-content">
+                    <h3>Start Calling</h3>
+                    <p>Once you see your friend in the "Active Participants" list, click the green Phone icon to start a secure WebRTC call.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="help-footer">
+                <button className="btn-primary" onClick={() => setShowHelp(false)} style={{ width: '100%' }}>Got it, let's go!</button>
+              </div>
             </motion.div>
           </motion.div>
         )}
