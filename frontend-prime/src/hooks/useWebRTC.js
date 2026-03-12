@@ -15,6 +15,7 @@ export const useWebRTC = (roomName, apiKeyInput = null) => {
     const [logs, setLogs] = useState([]);
     const [participants, setParticipants] = useState([]);
     const [liveAiInsight, setLiveAiInsight] = useState("AI: Monitoring session start...");
+    const [isSpeakerEnabled, setIsSpeakerEnabled] = useState(true);
 
     useEffect(() => {
         if (apiKeyInput) {
@@ -121,6 +122,7 @@ export const useWebRTC = (roomName, apiKeyInput = null) => {
         iceQueueRef.current = [];
         setInCall(false);
         setIsMuted(false);
+        setIsSpeakerEnabled(true);
         setLiveAiInsight("AI: Session summary available in history.");
         setStatus('Call Ended');
         log('Call ended locally');
@@ -270,6 +272,15 @@ export const useWebRTC = (roomName, apiKeyInput = null) => {
         }
     };
 
+    const toggleSpeaker = () => {
+        if (remoteAudioRef.current) {
+            const newState = !isSpeakerEnabled;
+            remoteAudioRef.current.muted = !newState;
+            setIsSpeakerEnabled(newState);
+            log(newState ? 'Speaker enabled' : 'Speaker muted');
+        }
+    };
+
     // Simulate Live AI Insights
     useEffect(() => {
         if (!inCall) return;
@@ -296,6 +307,7 @@ export const useWebRTC = (roomName, apiKeyInput = null) => {
         isConnected,
         isMuted,
         inCall,
+        isSpeakerEnabled,
         logs,
         participants,
         liveAiInsight,
@@ -303,6 +315,7 @@ export const useWebRTC = (roomName, apiKeyInput = null) => {
         startCall,
         endCall,
         toggleMute,
+        toggleSpeaker,
         localStream: localStreamRef.current
     };
 };

@@ -16,7 +16,9 @@ import {
   Key,
   Menu,
   X,
-  HelpCircle
+  HelpCircle,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -28,11 +30,13 @@ function App() {
     isConnected,
     isMuted,
     inCall,
+    isSpeakerEnabled,
     logs,
     connectSignaling,
     startCall,
     endCall,
     toggleMute,
+    toggleSpeaker,
     localStream,
     participants,
     liveAiInsight
@@ -397,6 +401,16 @@ function App() {
                         }}
                       >
                         {isMuted ? <MicOff size={24} /> : <Mic size={24} />}
+                      </button>
+                      <button
+                        onClick={toggleSpeaker}
+                        style={{
+                          width: '64px', height: '64px', borderRadius: '50%', border: '1px solid var(--border)',
+                          background: !isSpeakerEnabled ? 'var(--danger)' : 'transparent', color: 'white',
+                          display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', transition: 'all 0.3s'
+                        }}
+                      >
+                        {!isSpeakerEnabled ? <VolumeX size={24} /> : <Volume2 size={24} />}
                       </button>
                       <button
                         onClick={() => endCall(true)}
